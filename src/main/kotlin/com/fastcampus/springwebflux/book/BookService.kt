@@ -3,6 +3,8 @@ package com.fastcampus.springwebflux.book
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.util.concurrent.atomic.AtomicInteger
 
 data class Book(val id: Int, val name: String, val price: Int)
@@ -11,17 +13,17 @@ data class Book(val id: Int, val name: String, val price: Int)
 class BookService {
     private val nextId = AtomicInteger(0)
 
-    val books = mutableListOf(
+    val books: MutableList<Book> = mutableListOf(
         Book(id = nextId.incrementAndGet(), name = "코틀린 인 액션", price = 30_000),
         Book(id = nextId.incrementAndGet(), name = "HTTP 완벽 가이드", price = 40_000),
     )
 
     fun getAll(): Flux<Book> {
-        return Flux.fromIterable(books)
+        return books.toFlux()
     }
 
     fun get(id: Int): Mono<Book> {
-        return Mono.justOrEmpty(books.find { id == it.id })
+        return books.find { id == it.id }.toMono()
     }
 
     fun add(request: Map<String, Any>): Mono<Book> {
